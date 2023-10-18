@@ -15,7 +15,6 @@ capacity EQU 100
 sbstrI db 0
 flag dw 0
  
- 
 .code         
 normalizeString macro string, stringLen   ; delete space duplicates
     local next, nextSymbol, stringLoop, return, first
@@ -100,7 +99,7 @@ mov ds, ax
 mov es, ax  
   
 mov ah, capacity     
-mov string[0], ah    ;first byte - max srting size
+mov string[0], ah    ;first byte - max string size
 mov sbstrToRemove[0], ah 
 mov sbstrToInsert[0], ah     
 
@@ -112,7 +111,6 @@ call stringLen
 mov strLen,cl        
 normalizeString string, strLen
 lea dx, string
-;call puts  ; output mistake
 
 lea dx, msg2
 call puts
@@ -129,7 +127,7 @@ mov cl, string[1]
 sub cl, sbstrToRemove[1]
 jb End
 inc cl
-cld
+cld       ; clear direction flag
 
 lea si, string[2]
 lea di, sbstrToRemove[2]
@@ -178,7 +176,6 @@ mov al,[bx]
 cmp al,string[2]
 je end1start
 dec bx
-;dec si
 loop wordLoop   
 
 end1start:
@@ -263,30 +260,28 @@ ret
 endp DeleteSubstring
 
 InsertSubstring proc
-lea cx, string[2]    ; (load effective address) string 1st symbol address
-add cl, string[1]    ; add string length to get to next symbol after the last
-mov si, cx           ; last symbol as a source 
+lea cx, string[2]    
+add cl, string[1]    
+mov si, cx           
 dec si               ; decrement to get a last symbol
 mov bx, si           ; save last symbol in bx
 add bl, sbstrToInsert[1] ; now there is the last symbol of new string in bx
-mov di, bx           ; new last symbol is reciever            
+mov di, bx                      
 
 mov dx, ax           ; ax is a place to insert
-sub cx, dx           ; (cx - dx) after last symbol -= place to insert
-std                  ; (set direction flag) moving backward
+sub cx, dx           ; after last symbol place to insert
+std                  ; (set direction flag) moving backwards
 repe movsb           ; copy string from si to di while cx != 0, inserting a new string
 
 lea si, sbstrToInsert[2] ; source is sbstr 1st symbol
 mov di, ax          ; reciever is a place to insert
 xor cx, cx          ; set cx to zero
 mov cl, sbstrToInsert[1] ; sbstr length to cx
-cld                 ; moving forward
+cld                 ; direction flag = 0 moving forward
 repe movsb             
   
 ret
 endp InsertSubstring                
-
-; I/O procedures
 
 gets proc   
 mov ah, 0Ah
