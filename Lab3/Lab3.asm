@@ -1,13 +1,12 @@
 .model small
-.stack 100h
+.stack 100h 
+
 .data      
-size equ 30
-msg db "Enter matrix...$"  
-massiv dw size dup(?)
+massiv dw 30 dup(?)
 buffer db 7,7 dup('$')  
 error db 10,13,"Error! You entered unacceptable symbols", 10, 13," or number was overflowed, start AGAIN", 10, 13, '$'
-error_amount_less db 10,13, "amount should more than 0", 10,13,'$' 
-error_amount_more db 10,13, "amount should less than 31", 10,13,'$'   
+error_amount_less db 10,13, "Length should more than 0", 10,13,'$' 
+error_amount_more db 10,13, "Length should less than 31", 10,13,'$'   
 new_line db 10,13,'$'  
 new_element db 10,13,"Enter element:$"
 base dw 10
@@ -32,8 +31,7 @@ MaxLessMin db 0Ah, 0Dh, "Error: max cannot be less than min" , 0Ah, 0Dh, '$'
 OutPuting db 0Ah, 0Dh, "Result:" , 0Ah, 0Dh, '$' 
 NewString db 0Ah, 0Dh, '$'
 
-.code
-    
+.code  
 print_string macro str
     mov dx,offset str
     mov ah, 09h
@@ -57,15 +55,7 @@ input:
 buffer_cycle:    
     cmp cl, buffer+1
     jne get_digit
-     
-check_minus:
-    mov bl, buffer+2
-    cmp bl, '-'
-    jne get_digit
-    mov si,-1
-    inc di
-    loop buffer_cycle
-    
+        
 get_digit: 
     mov bl, buffer[di]
     inc di
@@ -102,7 +92,7 @@ error_input:
 get_number endp  
 
 get_numbers proc
-    mov cx,Amount
+    mov cx, Amount
     xor si,si
 matloop:
     push cx
@@ -118,7 +108,8 @@ matloop:
     MinFinding:
     cmp ax, MaxNumb
     jl MaxFinding:
-    mov MaxNumb, ax
+    mov MaxNumb, ax 
+    
     MaxFinding:
     inc si
     inc si
@@ -185,7 +176,6 @@ get_max proc
 	ret  
 get_max endp
 
-
 get_amount proc
     xor si,si
     call get_number
@@ -211,8 +201,6 @@ get_amount proc
     ret
 get_amount endp
 
-
-
 print_number proc
     pusha
     xor di, di
@@ -226,7 +214,7 @@ print_number proc
     neg ax
 convert:
     xor dx, dx
-    div base; ostatok v dl
+    div base
     add dl, '0'
     inc di
     push dx
@@ -277,11 +265,9 @@ Main:
     int 21h  
     call get_amount  
     mov ax, 0900h
-    int 21h
     call get_numbers
     call get_min
     call get_max
-    
          
     call print_massiv
     mov ax, 4c00h 
